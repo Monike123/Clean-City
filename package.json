@@ -1,0 +1,33 @@
+{
+  "name": "environment-tech-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-keywords": "^5.1.0",
+    "eslint": "^8.0.0",
+    "husky": "^9.0.0",
+    "postcss": "^8.4.23",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "overrides": {
+    "mobile": {
+      "tailwindcss": "3.3.2",
+      "postcss": "8.4.23"
+    }
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}

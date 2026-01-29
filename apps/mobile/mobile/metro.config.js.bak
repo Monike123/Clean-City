@@ -1,0 +1,27 @@
+const path = require('path');
+const { getDefaultConfig } = require("expo/metro-config");
+const { withNativeWind } = require("nativewind/metro");
+
+const projectRoot = __dirname;
+const workspaceRoot = path.resolve(projectRoot, '../..');
+
+const config = getDefaultConfig(projectRoot);
+
+// 1. Watch the root node_modules so we can resolve hoisted packages
+config.watchFolders = [workspaceRoot];
+
+// 2. Prioritize local node_modules, then fallback to root
+config.resolver.nodeModulesPaths = [
+    path.resolve(projectRoot, 'node_modules'),
+    path.resolve(workspaceRoot, 'node_modules'),
+];
+
+// 3. Force react-native to resolve to the local copy (SDK 54 compatible version)
+config.resolver.extraNodeModules = {
+    'react-native': path.resolve(projectRoot, 'node_modules/react-native'),
+};
+
+// 4. Disable package exports to avoid ESM resolution issues
+config.resolver.unstable_enablePackageExports = false;
+
+module.exports = withNativeWind(config, { input: "./global.css" });

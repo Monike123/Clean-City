@@ -1,0 +1,14 @@
+# AI Sentinel - Garbage Detection Service
+# Clear City - City Eye Module
+
+# Core dependencies
+ultralytics>=8.0.0     # YOLO model inference
+opencv-python>=4.8.0   # Video capture and processing
+supabase>=2.0.0        # Supabase client
+python-dotenv>=1.0.0   # Environment configuration
+flask>=3.0.0           # Video streaming server
+flask-cors>=4.0.0      # Cross-origin support
+
+# Optional: For better performance
+# torch>=2.0.0         # PyTorch (auto-installed with ultralytics)
+# numpy>=1.24.0        # Numerical processing

@@ -1,0 +1,10 @@
+node_modules
+.DS_Store
+dist
+coverage
+.env
+.expo
+web-build
+*.zip
+.venv
+__pycache__

@@ -1,0 +1,19 @@
+{
+    "name": "@environment-tech/shared",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "scripts": {
+        "build": "tsc"
+    },
+    "devDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.89.0",
+        "axios": "^1.13.2",
+        "lucide-react": "^0.562.0",
+        "react-router-dom": "^7.11.0",
+        "zustand": "^5.0.9"
+    }
+}

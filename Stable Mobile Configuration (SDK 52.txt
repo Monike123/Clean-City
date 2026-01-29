@@ -1,0 +1,335 @@
+Expo Mobile Project - Complete Setup Guide
+Purpose: This guide documents the complete setup process for an Expo mobile app with expo-router, NativeWind, and common dependencies. Use this as a reference to recreate or troubleshoot your project.
+
+Table of Contents
+Project Initialization
+Required Configuration Files
+Package Dependencies
+Common Issues & Solutions
+Running the App
+Project Initialization
+Option 1: Create New Project from Scratch
+# Create new Expo app with TypeScript
+npx create-expo-app@latest my-app --template blank-typescript
+# Navigate to project
+cd my-app
+# Install expo-router
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
+Option 2: Setup in Existing Monorepo
+# In your monorepo root
+mkdir -p apps/mobile
+cd apps/mobile
+# Initialize with Expo
+npx create-expo-app@latest . --template blank-typescript
+Required Configuration Files
+1. 
+package.json
+{
+  "name": "mobile",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "clear": "expo start -c",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~54.0.30",
+    "expo-asset": "~12.0.12",
+    "expo-constants": "~18.0.12",
+    "expo-font": "~14.0.10",
+    "expo-linking": "~8.0.11",
+    "expo-router": "~6.0.21",
+    "expo-splash-screen": "~31.0.13",
+    "expo-status-bar": "~3.0.9",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-reanimated": "~3.16.1",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1"
+  },
+  "devDependencies": {
+    "@types/react": "~18.3.12",
+    "babel-preset-expo": "~54.0.9",
+    "typescript": "~5.9.2"
+  },
+  "private": true
+}
+Critical Notes:
+
+✅ "main": "expo-router/entry" - Required for expo-router
+✅ React and React Native versions must match Expo SDK requirements
+✅ babel-preset-expo must be in devDependencies
+✅ react-native-svg required for icon libraries
+2. 
+app.json
+{
+  "expo": {
+    "name": "mobile",
+    "slug": "mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ]
+  }
+}
+Critical Notes:
+
+⚠️ "newArchEnabled": false - MUST be false for Expo Go compatibility
+✅ Include "expo-router" in plugins array
+3. 
+metro.config.js
+const { getDefaultConfig } = require('expo/metro-config');
+const path = require('path');
+const projectRoot = __dirname;
+const workspaceRoot = path.resolve(projectRoot, '../..');
+const config = getDefaultConfig(projectRoot);
+// Monorepo support (optional, only if in monorepo)
+config.watchFolders = [workspaceRoot];
+config.resolver.nodeModulesPaths = [
+    path.resolve(projectRoot, 'node_modules'),
+    path.resolve(workspaceRoot, 'node_modules'),
+];
+config.resolver.disableHierarchicalLookup = true;
+module.exports = config;
+For NativeWind (if using):
+
+const { getDefaultConfig } = require('expo/metro-config');
+const { withNativeWind } = require("nativewind/metro");
+const config = getDefaultConfig(__dirname);
+module.exports = withNativeWind(config, { input: "./global.css" });
+4. 
+babel.config.js
+module.exports = function (api) {
+    api.cache(true);
+    return {
+        presets: [
+            ["babel-preset-expo", { jsxImportSource: "nativewind" }],
+            "nativewind/babel",
+        ],
+        plugins: [
+            // Required for Reanimated (must be last)
+            "react-native-reanimated/plugin",
+        ],
+    };
+};
+5. 
+tsconfig.json
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
+Package Dependencies
+Core Dependencies (Always Required)
+npx expo install expo expo-status-bar
+npx expo install react react-native
+Expo Router (File-based Routing)
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants
+Essential Utilities
+npx expo install expo-asset expo-font expo-splash-screen
+UI/Icons
+npx expo install react-native-svg lucide-react-native
+NativeWind (TailwindCSS for React Native)
+npm install nativewind tailwindcss
+npx expo install react-native-css-interop
+Create 
+tailwind.config.js
+:
+
+module.exports = {
+  presets: [require("nativewind/preset")],
+  content: [
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,jsx,ts,tsx}"
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+Create 
+global.css
+:
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+Project Structure
+mobile/
+├── app/                    # Expo Router - file-based routing
+│   ├── _layout.tsx        # Root layout
+│   ├── index.tsx          # Home/splash screen
+│   ├── (tabs)/            # Tab navigator group
+│   │   ├── _layout.tsx
+│   │   └── home.tsx
+│   └── (auth)/            # Auth screens group
+│       ├── login.tsx
+│       └── signup.tsx
+├── assets/                # Images, fonts, etc.
+├── components/            # Reusable components
+├── lib/                   # Utility functions, API clients
+├── store/                 # State management (Zustand, etc.)
+├── app.json              # Expo configuration
+├── package.json          # Dependencies
+├── metro.config.js       # Metro bundler config
+├── babel.config.js       # Babel configuration
+├── tsconfig.json         # TypeScript config
+└── global.css            # NativeWind styles
+Important Rules:
+
+❌ NO 
+App.tsx
+ or 
+index.ts
+ with expo-router
+✅ Entry point is automatic via expo-router/entry
+✅ Routing based on app/ directory structure
+Common Issues & Solutions
+Issue 1: TurboModule Error - "PlatformConstants could not be found"
+Error:
+
+Invariant Violation: TurboModuleRegistry.getEnforcing(...): 
+'PlatformConstants' could not be found.
+Solution:
+
+Set "newArchEnabled": false in 
+app.json
+Run npx expo install --fix to align package versions
+Ensure React Native version matches Expo SDK (use 0.81.5 for SDK 54)
+Issue 2: "Cannot find module 'babel-preset-expo'"
+Solution:
+
+npm install --save-dev babel-preset-expo@~54.0.9
+Issue 3: "Unable to resolve 'expo-asset'"
+Solution:
+
+npx expo install expo-asset
+Issue 4: "Unable to resolve 'react-native-svg'"
+Solution:
+
+npx expo install react-native-svg
+Issue 5: Version Mismatch Warnings
+Solution:
+
+# Automatically fix all version mismatches
+npx expo install --fix
+This command updates all packages to SDK-compatible versions.
+
+Issue 6: Metro Bundler Cache Issues
+Solution:
+
+# Clear cache and restart
+npm run clear
+# or
+npx expo start -c
+Running the App
+Development Server
+# Start server (normal mode)
+npm start
+# Start with cache cleared
+npm run clear
+Testing on Device
+Expo Go (Recommended for Development)
+Install Expo Go app:
+
+Android: Play Store
+iOS: App Store
+Scan QR code shown in terminal
+
+App will load on your device
+
+Development Build (For Production Features)
+# Create development build
+npx expo run:android
+# or
+npx expo run:ios
+Setup Checklist
+When creating a new Expo project or troubleshooting, verify:
+
+ 
+package.json
+ has "main": "expo-router/entry"
+ NO 
+App.tsx
+ or 
+index.ts
+ files in root
+ babel-preset-expo is in devDependencies
+ expo-asset and react-native-svg are installed
+ 
+app.json
+ has "newArchEnabled": false
+ 
+app/_layout.tsx
+ exists
+ React and React Native versions match Expo SDK
+ Run npx expo install --fix if version warnings appear
+ Clear cache with npx expo start -c after config changes
+Quick Recovery Commands
+If your app breaks, run these in order:
+
+# 1. Fix version mismatches
+npx expo install --fix
+# 2. Clean and reinstall
+rm -rf node_modules
+npm install
+# 3. Start with cleared cache
+npx expo start -c
+Version Information
+For Expo SDK 54 (as of Dec 2025):
+
+Expo: ~54.0.30
+React: 19.1.0
+React Native: 0.81.5
+babel-preset-expo: ~54.0.9
+expo-router: ~6.0.21
+Check your Expo version:
+
+npx expo --version
+Update Expo CLI:
+
+npm install -g expo-cli@latest
+Additional Resources
+Expo Documentation
+Expo Router Documentation
+NativeWind Documentation
+React Native Documentation
+Notes
+IMPORTANT
+
+Always use npx expo install instead of npm install for Expo-managed packages. This ensures version compatibility with your Expo SDK.
+
+TIP
+
+When adding new dependencies, run npx expo install --fix afterward to ensure compatibility.
+
+WARNING
+
+Expo Go has limitations. For features like push notifications, in-app purchases, or custom native modules, you need a development build.
